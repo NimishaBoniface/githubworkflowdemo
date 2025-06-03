@@ -45,7 +45,7 @@ jobs:
     needs: deploy-ct
     runs-on: ubuntu-latest
     environment:
-      name: prod
+      name: ct
     steps:
       - name: Waiting for Prod approval
         run: echo "Waiting for manual Prod approval"
