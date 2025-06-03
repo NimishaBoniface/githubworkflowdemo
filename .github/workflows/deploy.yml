@@ -1,0 +1,58 @@
+name: Simple CI/CD with Manual Approval
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: mvn clean install
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Dev
+        run: echo "Deployed to Dev"
+
+  wait-ct:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment:
+      name: ct
+    steps:
+      - name: Waiting for CT approval
+        run: echo "Waiting for manual CT approval"
+
+  deploy-ct:
+    needs: wait-ct
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to CT
+        run: echo "Deployed to CT"
+
+  wait-prod:
+    needs: deploy-ct
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+    steps:
+      - name: Waiting for Prod approval
+        run: echo "Waiting for manual Prod approval"
+
+  deploy-prod:
+    needs: wait-prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Prod
+        run: echo "Deployed to Prod"
